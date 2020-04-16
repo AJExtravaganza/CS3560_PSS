@@ -24,7 +24,7 @@ class Task:
 
             start_date_string = str(json['StartDate'])
             start_hours = validate_fractional_hours(json['StartTime'])
-            self.start = datetime.strptime(start_date_string, '%Y%m%d')\
+            self.start = datetime.strptime(start_date_string, '%Y%m%d') \
                 .replace(hour=floor(start_hours), minute=int(start_hours % 1 * 60))
 
             duration_hours = validate_fractional_hours(json['Duration'])
@@ -35,3 +35,15 @@ class Task:
 
         if self.type not in self.valid_types:
             raise ValueError("Attempted to instantiate task from invalid data: " + str(json))
+
+    def __lt__(self, other):
+        return self.start < other.start
+
+    def as_dict(self):
+        return {
+            'Name': self.name,
+            'Type': self.type,
+            'StartDate': int(self.start.strftime('%Y%m%d')),
+            'StartTime': self.start.hour + self.start.minute / 60,
+            'Duration': self.duration_minutes / 60
+        }

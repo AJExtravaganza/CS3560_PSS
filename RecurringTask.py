@@ -3,7 +3,6 @@ from calendar import monthrange
 from datetime import date, datetime, timedelta
 from typing import List
 
-from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
 
 
@@ -16,14 +15,19 @@ class RecurrenceFrequency(enum.Enum):
 class RecurringTask(Task):
     end_date: date
     frequency: RecurrenceFrequency
-    cancellations: List[date] = []
-    valid_types = RecurringTaskInstance.valid_types
+    cancellations: List[date]
+    valid_types = {
+        'Class',
+        'Study',
+        'Sleep',
+        'Exercise',
+        'Work',
+        'Meal',
+    }
 
     def __init__(self, json: dict):
         try:
-            self.name = json['Name']
-            self.type = json['Type']
-
+            self.cancellations = []
             end_date_string = str(json['EndDate'])
             self.end_date = datetime.strptime(end_date_string, '%Y%m%d').date()
 
@@ -34,7 +38,15 @@ class RecurringTask(Task):
             raise ValueError(f"Task definition has invalid data: {err}")
         super().__init__(json)
 
-    def generate_recurrences(self):
+    def as_dict(self):
+        base = super(RecurringTask, self).as_dict()
+        base.update({
+            'EndDate': int(self.end_date.strftime('%Y%m%d')),
+            'Frequency': self.frequency.value
+        })
+        return base
+
+    def generate_recurrence_datetimes(self):
         def days_in_month(year: int, month: int):
             return monthrange(year, month)[1]
 
@@ -63,6 +75,11 @@ class RecurringTask(Task):
 
         return recurrences
 
+    # def generate_instances(self, **kwargs):
+    #     range_start = kwargs.get('start', self.start)
+    #     range_end = kwargs.get('end', self.end_date)
+    #     instances =
+
     def coincides_with(self, dt: datetime) -> bool:
         if dt < self.start or dt.date() > self.end_date:
             return False
@@ -74,7 +91,7 @@ class RecurringTask(Task):
         if self.frequency == RecurrenceFrequency.DAILY:
             return True
 
-        return dt in self.generate_recurrences()
+        return dt in self.generate_recurrence_datetimes()
 
     def add_cancellation(self, dt):
         if not self.coincides_with(dt):

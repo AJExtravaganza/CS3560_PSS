@@ -16,3 +16,9 @@ class FileHandler:
         records = json.loads(data)['tasks']
 
         return [TaskFactory.from_dict(record) for record in records]
+
+    def write_tasks(self, tasks: List[Task]):
+        with open(self.filename, 'w') as output_file:
+            output_file.write(json.dumps({
+                'tasks': [task.as_dict() for task in tasks]
+            }))

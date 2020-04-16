@@ -1,10 +1,14 @@
-from functools import reduce
 from typing import List
 
 from AntiTask import AntiTask
 from FileHandler import FileHandler
 from RecurringTask import RecurringTask
 from TransientTask import TransientTask
+
+
+def generate_anti_tasks(recurring_tasks: List[RecurringTask]) -> List[AntiTask]:
+    return [AntiTask.from_recurring_task(recurring_task, dt) for recurring_task in recurring_tasks for dt in
+            recurring_task.cancellations]
 
 
 class TaskCollectionModel:
@@ -30,3 +34,9 @@ class TaskCollectionModel:
                     matching_task.add_cancellation(anti_task.start)
             except KeyError as err:
                 pass
+
+    def save(self, **kwargs):
+        filename = kwargs.get('filename', 'schedule.json')
+        file_handler = FileHandler(filename)
+        tasks = self.transient_tasks + self.recurring_tasks + generate_anti_tasks(self.recurring_tasks)
+        file_handler.write_tasks(tasks)
