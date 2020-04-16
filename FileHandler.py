@@ -6,7 +6,7 @@ from TaskFactory import TaskFactory
 
 
 class FileHandler:
-    def __init__(self, filename = 'schedule.json'):
+    def __init__(self, filename):
         self.filename = filename
 
     def read_tasks(self) -> List[Task]:

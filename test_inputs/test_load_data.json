@@ -10,16 +10,16 @@
     {
       "Name": "Mobile Dev",
       "Type": "Class",
-      "StartDate": 20200201,
+      "StartDate": 20200131,
       "StartTime": 10,
       "Duration": 1.75,
-      "EndDate": 20200222,
-      "Frequency": 7
+      "EndDate": 20200401,
+      "Frequency": 30
     },
     {
       "Name": "Mobile Dev",
       "Type": "Cancellation",
-      "StartDate": 20200208,
+      "StartDate": 20200331,
       "StartTime": 10,
       "Duration": 1.75
     }

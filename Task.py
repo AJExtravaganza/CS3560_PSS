@@ -35,4 +35,3 @@ class Task:
 
         if self.type not in self.valid_types:
             raise ValueError("Attempted to instantiate task from invalid data: " + str(json))
-
