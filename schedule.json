@@ -1,0 +1,27 @@
+{
+  "tasks": [
+    {
+      "Name": "Mobile Dev",
+      "Type": "Class",
+      "StartDate": 20200201,
+      "StartTime": 10,
+      "Duration": 1.75,
+      "EndDate": 20200401,
+      "Frequency": 7
+    },
+    {
+      "Name": "COVID Supply Run",
+      "Type": "Visit",
+      "StartDate": 20200209,
+      "StartTime": 12,
+      "Duration": 2.00
+    },
+    {
+      "Name": "Mobile Dev",
+      "Type": "Cancellation",
+      "StartDate": 20200208,
+      "StartTime": 10,
+      "Duration": 1.75
+    }
+  ]
+}
