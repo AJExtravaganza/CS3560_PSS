@@ -81,9 +81,6 @@ class TaskCollectionModel:
             raise NoAntiTaskMatchError(
                 f'No task matching Antitask with name {anti_task.name} coinciding with start={anti_task.start} and duration_minutes={anti_task.duration_minutes}')
 
-    def update_task(self, task: Task):
-        pass
-
     def remove_task(self, task: Task):
         if task.__class__ == AntiTask:
             self.remove_cancellation(task)
