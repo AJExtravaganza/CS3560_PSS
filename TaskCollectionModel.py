@@ -1,4 +1,3 @@
-from datetime import date
 from typing import List
 
 from AntiTask import AntiTask
@@ -22,6 +21,10 @@ class TaskOverlapError(TaskInsertionError):
 
 
 class NoAntiTaskMatchError(TaskInsertionError):
+    pass
+
+
+class NoExistingTaskMatchError(ValueError):
     pass
 
 
@@ -73,7 +76,7 @@ class TaskCollectionModel:
 
         if matching_task.coincides_with(
                 anti_task.start) and matching_task.duration_minutes == anti_task.duration_minutes:
-            matching_task.add_cancellation(anti_task.start)
+            matching_task.add_cancellation(anti_task.start.date())
         else:
             raise NoAntiTaskMatchError(
                 f'No task matching Antitask with name {anti_task.name} coinciding with start={anti_task.start} and duration_minutes={anti_task.duration_minutes}')
@@ -81,11 +84,26 @@ class TaskCollectionModel:
     def update_task(self, task: Task):
         pass
 
-    def delete_task(self, task: Task):
-        pass
+    def remove_task(self, task: Task):
+        if task.__class__ == AntiTask:
+            self.remove_cancellation(task)
 
-    def remove_cancellation(self, task: Task, date: date):
-        pass
+        if task.__class__ == TransientTask:
+            tasks_to_search = self.transient_tasks
+        elif task.__class__ == RecurringTask:
+            tasks_to_search = self.recurring_tasks
+        else:
+            raise RuntimeError(f'Unrecognised Task subclass {task.__class__}')
+
+        try:
+            matching_task = next(filter(lambda existing_task: existing_task.name == task.name, tasks_to_search))
+            tasks_to_search.remove(matching_task)
+        except StopIteration:
+            raise NoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
+
+    def remove_cancellation(self, anti_task: AntiTask):
+        matching_task = next(filter(lambda existing_task: existing_task.name == anti_task.name, self.recurring_tasks))
+        matching_task.remove_cancellation(anti_task.start.date())
 
     def load(self, **kwargs):
         filename = kwargs.get('filename', 'schedule.json')

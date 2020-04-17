@@ -14,9 +14,8 @@ class AntiTask(Task):
             and recurring_task.coincides_with(self.start)
 
     @staticmethod
-    def from_recurring_task(recurring_task: RecurringTask, dt: date):
+    def from_recurring_task(recurring_task: RecurringTask, d: date):
         init_data = recurring_task.as_dict()
-        # start = recurring_task.start.replace(year=dt.year, month=dt.month, day=dt.day)
-        init_data['StartDate'] = dt.strftime('%Y%m%d')
+        init_data['StartDate'] = d.strftime('%Y%m%d')
         init_data['Type'] = 'Cancellation'
         return AntiTask(init_data)

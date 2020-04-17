@@ -89,9 +89,16 @@ class RecurringTask(Task):
 
         return dt in self.generate_recurrence_datetimes()
 
-    def add_cancellation(self, dt):
+    def add_cancellation(self, d: date):
+        dt = datetime(year=d.year, month=d.month, day=d.day).replace(hour=self.start.hour, minute=self.start.minute)
         if not self.coincides_with(dt):
             raise ValueError(
-                f'datetime {dt} does not coincide with start_date={self.start}, frequency={self.frequency}')
+                f'date {d} does not coincide with start_date={self.start.date()}, frequency={self.frequency}')
 
-        self.cancellations.append(dt)
+        self.cancellations.append(d)
+
+    def remove_cancellation(self, cancellation_date: date):
+        if cancellation_date not in self.cancellations:
+            raise ValueError(f'Task "{self.name} has no existing cancellation on {cancellation_date}"')
+
+        self.cancellations.remove(cancellation_date)

@@ -52,6 +52,31 @@ class Tests():
         ])
 
     @staticmethod
+    def test_remove_tasks_from_model():
+        collection_model = TaskCollectionModel()
+        collection_model.load(filename='test_inputs/test_input_file_parse.json')
+
+        test_equal(len(collection_model.transient_tasks), 1)
+        collection_model.remove_task(collection_model.transient_tasks[0])
+        test_equal(len(collection_model.transient_tasks), 0)
+
+        test_equal(len(collection_model.recurring_tasks), 1)
+        test_equal(len(collection_model.recurring_tasks[0].cancellations), 1)
+        recurring_task = collection_model.recurring_tasks[0]
+        anti_task = AntiTask.from_recurring_task(recurring_task, recurring_task.cancellations[0])
+        collection_model.remove_cancellation(anti_task)
+        test_equal(len(collection_model.recurring_tasks[0].cancellations), 0)
+        test_equal(collection_model.recurring_tasks[0].generate_recurrence_datetimes(), [
+            datetime(year=2020, month=1, day=31, hour=10),
+            datetime(year=2020, month=2, day=29, hour=10),
+            datetime(year=2020, month=3, day=31, hour=10),
+        ])
+
+        collection_model.remove_task(collection_model.recurring_tasks[0])
+        test_equal(len(collection_model.recurring_tasks), 0)
+
+
+    @staticmethod
     def test_output_file_write():
         collection_model = TaskCollectionModel()
         collection_model.load(filename='test_inputs/test_input_file_parse.json')
@@ -92,7 +117,8 @@ class Tests():
 
 
 Tests.test_input_file_parse()
-Tests.test_load_data()
+Tests.test_add_tasks_to_model()
+Tests.test_remove_tasks_from_model()
 Tests.test_output_file_write()
 Tests.test_name_conflict()
 Tests.test_task_overlap()
