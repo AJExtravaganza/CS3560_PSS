@@ -39,7 +39,7 @@ class Tests():
         test_equal(anti_task.__class__, AntiTask)
 
     @staticmethod
-    def test_load_data():
+    def test_add_tasks_to_model():
         collection_model = TaskCollectionModel()
         collection_model.load(filename='test_inputs/test_input_file_parse.json')
 
@@ -49,7 +49,6 @@ class Tests():
         test_equal(collection_model.recurring_tasks[0].generate_recurrence_datetimes(), [
             datetime(year=2020, month=1, day=31, hour=10),
             datetime(year=2020, month=2, day=29, hour=10),
-            datetime(year=2020, month=3, day=31, hour=10),
         ])
 
     @staticmethod

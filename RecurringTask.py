@@ -60,7 +60,8 @@ class RecurringTask(Task):
         recurrences = []
 
         while current_datetime.date() <= self.end_date:
-            recurrences.append(current_datetime)
+            if current_datetime.date() not in self.cancellations:
+                recurrences.append(current_datetime)
 
             if self.frequency == RecurrenceFrequency.DAILY:
                 current_datetime += timedelta(days=1)
