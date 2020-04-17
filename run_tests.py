@@ -1,11 +1,19 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from AntiTask import AntiTask
 from FileHandler import FileHandler
 from RecurringTask import RecurringTask
+from Task import Task
 from TaskCollectionModel import TaskCollectionModel
 from TransientTask import TransientTask
+
+
+def test(expr: bool):
+    try:
+        assert expr == True
+    except AssertionError as err:
+        raise AssertionError(f'{err} Expected True, got {expr}')
 
 
 def test_equal(value, expected):
@@ -56,7 +64,29 @@ class Tests():
             output = json.loads(output_file.read())
             test_equal(output['tasks'], input['tasks'])
 
+    @staticmethod
+    def test_task_overlap():
+        now = datetime.now()
+
+        class TestStructure:
+            def __init__(self, start_offset, end_offset):
+                self.start = now + timedelta(minutes=start_offset)
+                self.duration_minutes = start_offset + end_offset
+
+        a = TestStructure(0, 5)
+        b = TestStructure(2, 7)
+        c = TestStructure(5, 10)
+
+        test(Task.overlaps(a, b))
+        test(Task.overlaps(b, a))
+        test(Task.overlaps(b, c))
+        test(Task.overlaps(c, b))
+        test(not Task.overlaps(a, c))
+        test(not Task.overlaps(c, a))
+
 
 Tests.test_input_file_parse()
 Tests.test_load_data()
 Tests.test_output_file_write()
+Tests.test_task_overlap()
+

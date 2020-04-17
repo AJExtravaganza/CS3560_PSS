@@ -1,5 +1,5 @@
 from collections import Set
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import floor
 
 
@@ -38,6 +38,14 @@ class Task:
 
     def __lt__(self, other):
         return self.start < other.start
+
+    def overlaps(self, other):
+        self_finish = self.start + timedelta(minutes=self.duration_minutes)
+        other_finish = other.start + timedelta(minutes=other.duration_minutes)
+        if self.start > other.start:
+            return self.start < other_finish
+        else:
+            return self_finish > other.start
 
     def as_dict(self):
         return {
