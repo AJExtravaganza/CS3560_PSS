@@ -1,0 +1,36 @@
+{
+  "tasks": [
+    {
+      "Name": "Doppelganger",
+      "Type": "Visit",
+      "StartDate": 20200101,
+      "StartTime": 0.0,
+      "Duration": 1.0
+    },
+    {
+      "Name": "Doppelganger",
+      "Type": "Class",
+      "StartDate": 20210101,
+      "StartTime": 10.0,
+      "Duration": 1.0,
+      "EndDate": 20210101,
+      "Frequency": 30
+    },
+    {
+      "Name": "Accepted",
+      "Type": "Class",
+      "StartDate": 20220101,
+      "StartTime": 10.0,
+      "Duration": 1.0,
+      "EndDate": 20210101,
+      "Frequency": 30
+    },
+    {
+      "Name": "Doppelganger",
+      "Type": "Appointment",
+      "StartDate": 20200102,
+      "StartTime": 0.0,
+      "Duration": 1.0
+    }
+  ]
+}

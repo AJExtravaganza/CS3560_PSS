@@ -1,0 +1,27 @@
+{
+  "tasks": [
+    {
+      "Name": "Big Old Task",
+      "Type": "Visit",
+      "StartDate": 20200201,
+      "StartTime": 0.0,
+      "Duration": 12.0
+    },
+    {
+      "Name": "Conflicting Recurrence",
+      "Type": "Class",
+      "StartDate": 20200101,
+      "StartTime": 10.0,
+      "Duration": 1.75,
+      "EndDate": 20200205,
+      "Frequency": 30
+    },
+    {
+      "Name": "Conflicting Transient",
+      "Type": "Visit",
+      "StartDate": 20200331,
+      "StartTime": 10.0,
+      "Duration": 1.0
+    }
+  ]
+}

@@ -75,11 +75,6 @@ class RecurringTask(Task):
 
         return recurrences
 
-    # def generate_instances(self, **kwargs):
-    #     range_start = kwargs.get('start', self.start)
-    #     range_end = kwargs.get('end', self.end_date)
-    #     instances =
-
     def coincides_with(self, dt: datetime) -> bool:
         if dt < self.start or dt.date() > self.end_date:
             return False

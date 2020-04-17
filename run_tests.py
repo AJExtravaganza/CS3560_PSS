@@ -54,15 +54,22 @@ class Tests():
 
     @staticmethod
     def test_output_file_write():
-        _collection_model = TaskCollectionModel()
-        _collection_model.load(filename='test_inputs/test_input_file_parse.json')
-        _collection_model.save(filename='test_inputs/test_output_file_write.json')
+        collection_model = TaskCollectionModel()
+        collection_model.load(filename='test_inputs/test_input_file_parse.json')
+        collection_model.save(filename='test_inputs/test_output_file_write.json')
 
         with open('test_inputs/test_input_file_parse.json', 'r') as input_file, \
                 open('test_inputs/test_output_file_write.json', 'r') as output_file:
             input = json.loads(input_file.read())
             output = json.loads(output_file.read())
             test_equal(output['tasks'], input['tasks'])
+
+    @staticmethod
+    def test_name_conflict():
+        collection_model = TaskCollectionModel()
+        collection_model.load(filename='test_inputs/test_name_conflict.json')
+        test_equal(len(collection_model.transient_tasks), 1)
+        test_equal(len(collection_model.recurring_tasks), 1)
 
     @staticmethod
     def test_task_overlap():
@@ -88,5 +95,6 @@ class Tests():
 Tests.test_input_file_parse()
 Tests.test_load_data()
 Tests.test_output_file_write()
+Tests.test_name_conflict()
 Tests.test_task_overlap()
 
