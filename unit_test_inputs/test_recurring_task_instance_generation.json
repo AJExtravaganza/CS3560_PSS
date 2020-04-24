@@ -1,0 +1,31 @@
+{
+  "tasks": [
+    {
+      "Name": "Daily2",
+      "Type": "Class",
+      "StartDate": 20200101,
+      "StartTime": 0.0,
+      "Duration": 1,
+      "EndDate": 20200102,
+      "Frequency": 1
+    },
+    {
+      "Name": "Weekly2",
+      "Type": "Class",
+      "StartDate": 20200201,
+      "StartTime": 0.0,
+      "Duration": 1,
+      "EndDate": 20200208,
+      "Frequency": 7
+    },
+    {
+      "Name": "Monthly2",
+      "Type": "Class",
+      "StartDate": 20200301,
+      "StartTime": 0.0,
+      "Duration": 1,
+      "EndDate": 20200401,
+      "Frequency": 30
+    }
+  ]
+}

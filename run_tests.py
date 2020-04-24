@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from AntiTask import AntiTask
 from FileHandler import FileHandler
 from RecurringTask import RecurringTask
+from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
 from TaskCollectionModel import TaskCollectionModel
 from TransientTask import TransientTask
@@ -50,6 +51,44 @@ class Tests():
             datetime(year=2020, month=1, day=31, hour=10),
             datetime(year=2020, month=2, day=29, hour=10),
         ])
+
+    @staticmethod
+    def test_recurring_task_instance_generation():
+        collection_model = TaskCollectionModel()
+        collection_model.load(filename='unit_test_inputs/test_recurring_task_instance_generation.json')
+
+        daily_task = collection_model.recurring_tasks[0]
+        weekly_task = collection_model.recurring_tasks[1]
+        monthly_task = collection_model.recurring_tasks[2]
+
+        daily_task_0_start = datetime(year=2020, month=1, day=1, hour=00)
+        daily_task_1_start = datetime(year=2020, month=1, day=2, hour=00)
+
+        weekly_task_0_start = datetime(year=2020, month=2, day=1, hour=00)
+        weekly_task_1_start = datetime(year=2020, month=2, day=8, hour=00)
+
+        monthly_task_0_start = datetime(year=2020, month=3, day=1, hour=00)
+        monthly_task_1_start = datetime(year=2020, month=4, day=1, hour=00)
+
+        test_equal(daily_task.generate_recurrence_datetimes(), [
+            daily_task_0_start,
+            daily_task_1_start
+        ])
+        test_equal(weekly_task.generate_recurrence_datetimes(), [
+            weekly_task_0_start,
+            weekly_task_1_start
+        ])
+        test_equal(monthly_task.generate_recurrence_datetimes(), [
+            monthly_task_0_start,
+            monthly_task_1_start
+        ])
+
+        test_equal(RecurringTaskInstance.generate_instances(daily_task)[0].start, daily_task_0_start)
+        test_equal(RecurringTaskInstance.generate_instances(daily_task)[1].start, daily_task_1_start)
+        test_equal(RecurringTaskInstance.generate_instances(weekly_task)[0].start, weekly_task_0_start)
+        test_equal(RecurringTaskInstance.generate_instances(weekly_task)[1].start, weekly_task_1_start)
+        test_equal(RecurringTaskInstance.generate_instances(monthly_task)[0].start, monthly_task_0_start)
+        test_equal(RecurringTaskInstance.generate_instances(monthly_task)[1].start, monthly_task_1_start)
 
     @staticmethod
     def test_remove_tasks_from_model():

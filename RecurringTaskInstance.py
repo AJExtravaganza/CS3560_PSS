@@ -9,6 +9,7 @@ class RecurringTaskInstance(Task):
 
     def __init__(self, recurring_task: RecurringTask, dt: datetime):
         super().__init__(recurring_task.as_dict())
+        self.start = dt
 
     @staticmethod
     def generate_instances(recurring_task: RecurringTask, **kwargs):
