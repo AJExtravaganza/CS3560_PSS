@@ -1,3 +1,4 @@
+
 class Field:
     def __init__(self, name: str, display_name: str, validator=None, validation_pattern_message=None):
         self.name = name

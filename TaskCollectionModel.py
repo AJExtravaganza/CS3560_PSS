@@ -6,26 +6,8 @@ from RecurringTask import RecurringTask
 from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
 from TransientTask import TransientTask
-
-
-class TaskInsertionError(ValueError):
-    pass
-
-
-class TaskNameNotUniqueError(TaskInsertionError):
-    pass
-
-
-class TaskOverlapError(TaskInsertionError):
-    pass
-
-
-class NoAntiTaskMatchError(TaskInsertionError):
-    pass
-
-
-class NoExistingTaskMatchError(ValueError):
-    pass
+from exceptions import TaskNameNotUniqueError, TaskOverlapError, NoAntiTaskMatchError, PSSError, \
+    NoExistingTaskMatchError, TaskInsertionError
 
 
 def generate_anti_tasks(recurring_tasks: List[RecurringTask]) -> List[AntiTask]:
@@ -90,7 +72,7 @@ class TaskCollectionModel:
         elif task.__class__ == RecurringTask:
             tasks_to_search = self.recurring_tasks
         else:
-            raise RuntimeError(f'Unrecognised Task subclass {task.__class__}')
+            raise PSSError(f'Unrecognised Task subclass {task.__class__}')
 
         try:
             matching_task = next(filter(lambda existing_task: existing_task.name == task.name, tasks_to_search))
@@ -110,7 +92,7 @@ class TaskCollectionModel:
             try:
                 self.add_task(task)
             except TaskInsertionError as err:
-                print(str(err) + ', skipping')
+                pass
 
         recurring_tasks_by_name = {}
         recurring_tasks_by_name.update([(task.name, task) for task in self.recurring_tasks])

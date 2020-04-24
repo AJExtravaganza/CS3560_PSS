@@ -1,9 +1,14 @@
+from typing import Type
+
 from AntiTask import AntiTask
 from Menu import Menu
 from MenuItem import MenuItem
 from RecurringTask import RecurringTask
+from Task import Task
 from TaskCollectionModel import TaskCollectionModel
 from TransientTask import TransientTask
+from exceptions import PSSValidationError, PSSInvalidOperationError
+from ui_helpers import fields_as_dict, populate_fields
 
 
 class CreateTaskMenuItem(MenuItem):
@@ -14,7 +19,7 @@ class CreateTaskMenuItem(MenuItem):
         super().__init__('Create Task', self.create_task_through_ui)
 
     def create_task_through_ui(self):
-        task_create_type = Menu(
+        task_create_type: Type[Task] = Menu(
             [
                 MenuItem('Transient Task', lambda: TransientTask),
                 MenuItem('Recurring Task', lambda: RecurringTask),
@@ -23,22 +28,17 @@ class CreateTaskMenuItem(MenuItem):
             'What type of task would you like to create?',
         ).process()
 
-        if task_create_type == TransientTask:
-            self.create_transient_task_through_ui()
-        elif task_create_type == RecurringTask:
-            pass
-            # self.create_recurring_task_through_ui()
-        elif task_create_type == AntiTask:
-            pass
-            # self.create_cancellation_through_ui()
-        else:
+        if not task_create_type.__base__ == Task:
             raise RuntimeError('Invalid task type resulting from CreateTaskMenuItem.create_task_through_ui()')
 
-    def create_transient_task_through_ui(self):
-        pass
+        fields = task_create_type.get_input_fields()
+        populate_fields(fields)
+        field_values = fields_as_dict(fields)
 
-    def create_recurring_task_through_ui(self):
-        pass
+        task = TransientTask(field_values)
+        try:
+            self.model.add_task(task)
+        except PSSValidationError as err:
+            raise PSSInvalidOperationError(f'Could not complete operation: {err}')
 
-    def create_cancellation_task_through_ui(self):
-        pass
+        print(f'Successfully added {task}')

@@ -23,7 +23,12 @@ def validate_time_string(value: str):
 
 def validate_task_duration_string(value: str):
     try:
-        if not 0 <= int(value) <= 3600:
+        if not 0 < float(value):
             raise ValueError()
     except Exception:
+        raise ValueError()
+
+
+def validate_value_in_set(value, allowable_values: set):
+    if value not in allowable_values:
         raise ValueError()

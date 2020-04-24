@@ -2,10 +2,7 @@ from AntiTask import AntiTask
 from RecurringTask import RecurringTask
 from Task import Task
 from TransientTask import TransientTask
-
-
-class InvalidJsonTaskDefinition(Exception):
-    pass
+from exceptions import InvalidJsonTaskDefinition
 
 
 class TaskFactory:

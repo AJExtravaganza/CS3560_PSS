@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 from typing import List
 
 from Task import Task
+from exceptions import PSSValidationError
 
 
 class RecurrenceFrequency(enum.Enum):
@@ -33,9 +34,9 @@ class RecurringTask(Task):
 
             self.frequency = RecurrenceFrequency(json['Frequency'])
         except KeyError as err:
-            raise ValueError(f'Task definition lacks required field: {err}')
+            raise PSSValueError(f'Task definition lacks required field: {err}')
         except ValueError as err:
-            raise ValueError(f"Task definition has invalid data: {err}")
+            raise PSSValueError(f"Task definition has invalid data: {err}")
         super().__init__(json)
 
     def as_dict(self):
@@ -72,7 +73,7 @@ class RecurringTask(Task):
                 current_datetime = current_datetime.replace(
                     day=min(self.start.day, days_in_month(current_datetime.year, current_datetime.month)))
             else:
-                raise ValueError(f"RecurringTask.frequency {self.frequency} is invalid")
+                raise PSSValueError(f"RecurringTask.frequency {self.frequency} is invalid")
 
         return recurrences
 
@@ -92,13 +93,13 @@ class RecurringTask(Task):
     def add_cancellation(self, d: date):
         dt = datetime(year=d.year, month=d.month, day=d.day).replace(hour=self.start.hour, minute=self.start.minute)
         if not self.coincides_with(dt):
-            raise ValueError(
+            raise PSSValidationError(
                 f'date {d} does not coincide with start_date={self.start.date()}, frequency={self.frequency}')
 
         self.cancellations.append(d)
 
     def remove_cancellation(self, cancellation_date: date):
         if cancellation_date not in self.cancellations:
-            raise ValueError(f'Task "{self.name} has no existing cancellation on {cancellation_date}"')
+            raise PSSValidationError(f'Task "{self.name} has no existing cancellation on {cancellation_date}"')
 
         self.cancellations.remove(cancellation_date)

@@ -2,11 +2,11 @@ from typing import List
 
 from MenuItem import MenuItem
 from MenuView import MenuView
+from exceptions import PSSError, PSSInvalidOperationError
 
 
 class InvalidUserMenuSelectionError(ValueError):
     pass
-
 
 class Menu:
     def __init__(self, items: List[MenuItem], prompt: str = None):
@@ -24,7 +24,10 @@ class Menu:
             except InvalidUserMenuSelectionError:
                 view.display_invalid_selection_error()
 
-        return self.items[selection].process()
+        try:
+            return self.items[selection].process()
+        except PSSInvalidOperationError as err:
+            view.display_exception(err)
 
     def get_user_selection(self) -> int:
         def valid_selection(raw_selection: int):
@@ -33,7 +36,7 @@ class Menu:
             return lower_selection_bound <= raw_selection <= upper_selection_bound
 
         try:
-            selection = int(input())
+            selection = int(input('Please make a selection: '))
             if not valid_selection(selection):
                 raise ValueError
         except ValueError:

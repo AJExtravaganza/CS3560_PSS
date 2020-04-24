@@ -26,7 +26,7 @@ def test_equal(value, expected):
 class Tests():
     @staticmethod
     def test_input_file_parse():
-        file_handler = FileHandler('test_inputs/test_input_file_parse.json')
+        file_handler = FileHandler('unit_test_inputs/test_input_file_parse.json')
         tasks = file_handler.read_tasks()
         assert len(tasks) == 3
 
@@ -41,7 +41,7 @@ class Tests():
     @staticmethod
     def test_add_tasks_to_model():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='test_inputs/test_input_file_parse.json')
+        collection_model.load(filename='unit_test_inputs/test_input_file_parse.json')
 
         test_equal(len(collection_model.transient_tasks), 1)
         test_equal(len(collection_model.recurring_tasks), 1)
@@ -54,7 +54,7 @@ class Tests():
     @staticmethod
     def test_remove_tasks_from_model():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='test_inputs/test_input_file_parse.json')
+        collection_model.load(filename='unit_test_inputs/test_input_file_parse.json')
 
         test_equal(len(collection_model.transient_tasks), 1)
         collection_model.remove_task(collection_model.transient_tasks[0])
@@ -79,11 +79,11 @@ class Tests():
     @staticmethod
     def test_output_file_write():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='test_inputs/test_input_file_parse.json')
-        collection_model.save(filename='test_inputs/test_output_file_write.json')
+        collection_model.load(filename='unit_test_inputs/test_input_file_parse.json')
+        collection_model.save(filename='unit_test_inputs/test_output_file_write.json')
 
-        with open('test_inputs/test_input_file_parse.json', 'r') as input_file, \
-                open('test_inputs/test_output_file_write.json', 'r') as output_file:
+        with open('unit_test_inputs/test_input_file_parse.json', 'r') as input_file, \
+                open('unit_test_inputs/test_output_file_write.json', 'r') as output_file:
             input = json.loads(input_file.read())
             output = json.loads(output_file.read())
             test_equal(output['tasks'], input['tasks'])
@@ -91,7 +91,7 @@ class Tests():
     @staticmethod
     def test_name_conflict():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='test_inputs/test_name_conflict.json')
+        collection_model.load(filename='unit_test_inputs/test_name_conflict.json')
         test_equal(len(collection_model.transient_tasks), 1)
         test_equal(len(collection_model.recurring_tasks), 1)
 
@@ -123,3 +123,4 @@ Tests.test_output_file_write()
 Tests.test_name_conflict()
 Tests.test_task_overlap()
 
+print('Unit tests complete')

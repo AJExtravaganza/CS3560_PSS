@@ -4,7 +4,7 @@ from MenuItem import MenuItem
 
 
 class MenuView:
-    def __init__(self, items: List[MenuItem], prompt:str = None):
+    def __init__(self, items: List[MenuItem], prompt: str = None):
         self.items = items
         self.prompt = prompt
 
@@ -15,7 +15,10 @@ class MenuView:
         for idx, item in enumerate(self.items):
             print(f'{idx}) {item}')
 
-        print('Please make a selection: ')
+    @classmethod
+    def display_exception(cls, err: Exception):
+        print(f'Error: {err}')
 
-    def display_invalid_selection_error(self):
+    @classmethod
+    def display_invalid_selection_error(cls):
         print('Invalid selection.')
