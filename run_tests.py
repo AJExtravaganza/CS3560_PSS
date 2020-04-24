@@ -114,7 +114,6 @@ class Tests():
         collection_model.remove_task(collection_model.recurring_tasks[0])
         test_equal(len(collection_model.recurring_tasks), 0)
 
-
     @staticmethod
     def test_output_file_write():
         collection_model = TaskCollectionModel()
@@ -135,7 +134,7 @@ class Tests():
         test_equal(len(collection_model.recurring_tasks), 1)
 
     @staticmethod
-    def test_task_overlap():
+    def test_task_overlap_detection():
         now = datetime.now()
 
         class TestStructure:
@@ -154,12 +153,21 @@ class Tests():
         test(not Task.overlaps(a, c))
         test(not Task.overlaps(c, a))
 
+    @staticmethod
+    def test_task_overlap_conflict():
+        collection_model = TaskCollectionModel()
+        collection_model.load(filename='unit_test_inputs/test_overlapping_tasks.json')
+        test_equal(len(collection_model.transient_tasks), 1)
+        test_equal(len(collection_model.recurring_tasks), 1)
+
 
 Tests.test_input_file_parse()
 Tests.test_add_tasks_to_model()
+Tests.test_recurring_task_instance_generation()
 Tests.test_remove_tasks_from_model()
 Tests.test_output_file_write()
 Tests.test_name_conflict()
-Tests.test_task_overlap()
+Tests.test_task_overlap_detection()
+Tests.test_task_overlap_conflict()
 
 print('Unit tests complete')

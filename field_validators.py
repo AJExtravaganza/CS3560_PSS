@@ -1,4 +1,7 @@
 from datetime import datetime
+from typing import List
+
+from enum_RecurrenceFrequency import RecurrenceFrequency
 
 
 def validate_nonempty_string(value: str):
@@ -32,3 +35,12 @@ def validate_task_duration_string(value: str):
 def validate_value_in_set(value, allowable_values: set):
     if value not in allowable_values:
         raise ValueError()
+
+
+def validate_value_in_list(value, allowable_values: List):
+    if value not in allowable_values:
+        raise ValueError()
+
+
+def validate_recurrence_frequency(value: str):
+    validate_value_in_list(int(value), [enum.value for enum in RecurrenceFrequency])

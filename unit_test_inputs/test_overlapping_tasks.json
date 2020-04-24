@@ -1,27 +1,45 @@
 {
   "tasks": [
     {
-      "Name": "Big Old Task",
+      "Name": "Transient Setup",
       "Type": "Visit",
       "StartDate": 20200201,
       "StartTime": 0.0,
       "Duration": 12.0
     },
     {
-      "Name": "Conflicting Recurrence",
+      "Name": "Transient-on-transient Conflict",
+      "Type": "Visit",
+      "StartDate": 20200131,
+      "StartTime": 23.0,
+      "Duration": 2.0
+    },
+    {
+      "Name": "Recurrence-on-transient Conflict",
       "Type": "Class",
-      "StartDate": 20200101,
+      "StartDate": 20200131,
       "StartTime": 10.0,
-      "Duration": 1.75,
-      "EndDate": 20200205,
+      "Duration": 1.0,
+      "EndDate": 20200201,
+      "Frequency": 1
+    },
+    {
+      "Name": "Recurrence-on-recurrence Conflict Setup",
+      "Type": "Class",
+      "StartDate": 20000101,
+      "StartTime": 0.0,
+      "Duration": 1.0,
+      "EndDate": 20000201,
       "Frequency": 30
     },
     {
-      "Name": "Conflicting Transient",
-      "Type": "Visit",
-      "StartDate": 20200331,
-      "StartTime": 10.0,
-      "Duration": 1.0
+      "Name": "Recurrence-on-recurrence Conflict",
+      "Type": "Class",
+      "StartDate": 20000131,
+      "StartTime": 0.0,
+      "Duration": 1.0,
+      "EndDate": 20000201,
+      "Frequency": 1
     }
   ]
 }

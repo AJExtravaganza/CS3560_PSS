@@ -35,7 +35,7 @@ class CreateTaskMenuItem(MenuItem):
         populate_fields(fields)
         field_values = fields_as_dict(fields)
 
-        task = TransientTask(field_values)
+        task = task_create_type(field_values)
         try:
             self.model.add_task(task)
         except PSSValidationError as err:

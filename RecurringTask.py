@@ -3,14 +3,11 @@ from calendar import monthrange
 from datetime import date, datetime, timedelta
 from typing import List
 
+from Field import Field
 from Task import Task
+from enum_RecurrenceFrequency import RecurrenceFrequency
 from exceptions import PSSValidationError
-
-
-class RecurrenceFrequency(enum.Enum):
-    DAILY = 1
-    WEEKLY = 7
-    MONTHLY = 30
+from field_validators import validate_date_string, validate_recurrence_frequency
 
 
 class RecurringTask(Task):
@@ -32,12 +29,25 @@ class RecurringTask(Task):
             end_date_string = str(json['EndDate'])
             self.end_date = datetime.strptime(end_date_string, '%Y%m%d').date()
 
-            self.frequency = RecurrenceFrequency(json['Frequency'])
+            self.frequency = RecurrenceFrequency(int(json['Frequency']))
         except KeyError as err:
-            raise PSSValueError(f'Task definition lacks required field: {err}')
+            raise PSSValidationError(f'Task definition lacks required field: {err}')
         except ValueError as err:
-            raise PSSValueError(f"Task definition has invalid data: {err}")
+            raise PSSValidationError(f"Task definition has invalid data: {err}")
         super().__init__(json)
+
+    @classmethod
+    def get_input_fields(cls) -> List[Field]:
+        return super().get_input_fields() + [
+            Field('EndDate',
+                  'task end date',
+                  validate_date_string,
+                  'value must be date in YYYYMMDD format'),
+            Field('Frequency',
+                  'task recurrence frequency',
+                  validate_recurrence_frequency,
+                  f'value must be in {[enum_value for enum_value in RecurrenceFrequency]}')
+        ]
 
     def as_dict(self):
         base = super(RecurringTask, self).as_dict()
@@ -73,7 +83,7 @@ class RecurringTask(Task):
                 current_datetime = current_datetime.replace(
                     day=min(self.start.day, days_in_month(current_datetime.year, current_datetime.month)))
             else:
-                raise PSSValueError(f"RecurringTask.frequency {self.frequency} is invalid")
+                raise PSSValidationError(f"RecurringTask.frequency {self.frequency} is invalid")
 
         return recurrences
 
