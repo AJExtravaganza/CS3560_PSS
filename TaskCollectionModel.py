@@ -1,3 +1,4 @@
+import copy
 from typing import List
 
 from AntiTask import AntiTask
@@ -7,7 +8,7 @@ from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
 from TransientTask import TransientTask
 from exceptions import TaskNameNotUniqueError, TaskOverlapError, NoAntiTaskMatchError, PSSError, \
-    NoExistingTaskMatchError, TaskInsertionError
+    NoExistingTaskMatchError, TaskInsertionError, PSSInvalidOperationError
 
 
 def generate_anti_tasks(recurring_tasks: List[RecurringTask]) -> List[AntiTask]:
@@ -84,15 +85,24 @@ class TaskCollectionModel:
         matching_task = next(filter(lambda existing_task: existing_task.name == anti_task.name, self.recurring_tasks))
         matching_task.remove_cancellation(anti_task.start.date())
 
-    def load(self, **kwargs):
+    def import_tasks_from_file(self, **kwargs):
         filename = kwargs.get('filename', 'schedule.json')
+        revert_changes_on_error = kwargs.get('revert_changes_on_error', True)
         file_handler = FileHandler(filename)
+        transient_task_backup = copy.deepcopy(self.transient_tasks)
+        recurring_task_backup = copy.deepcopy(self.recurring_tasks)
 
-        for task in file_handler.read_tasks():
-            try:
-                self.add_task(task)
-            except TaskInsertionError as err:
-                pass
+        try:
+            for task in file_handler.read_tasks():
+                try:
+                    self.add_task(task)
+                except TaskInsertionError as err:
+                    if revert_changes_on_error:
+                        raise PSSInvalidOperationError()
+        except PSSInvalidOperationError:
+            # Revert changes if revert_changes_on_error
+            self.transient_tasks = transient_task_backup
+            self.recurring_tasks = recurring_task_backup
 
         recurring_tasks_by_name = {}
         recurring_tasks_by_name.update([(task.name, task) for task in self.recurring_tasks])

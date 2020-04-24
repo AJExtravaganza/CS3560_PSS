@@ -42,7 +42,9 @@ class Tests():
     @staticmethod
     def test_add_tasks_to_model():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='unit_test_inputs/test_input_file_parse.json')
+        collection_model.import_tasks_from_file(
+            filename='unit_test_inputs/test_input_file_parse.json',
+            revert_changes_on_error=False)
 
         test_equal(len(collection_model.transient_tasks), 1)
         test_equal(len(collection_model.recurring_tasks), 1)
@@ -55,7 +57,9 @@ class Tests():
     @staticmethod
     def test_recurring_task_instance_generation():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='unit_test_inputs/test_recurring_task_instance_generation.json')
+        collection_model.import_tasks_from_file(
+            filename='unit_test_inputs/test_recurring_task_instance_generation.json',
+            revert_changes_on_error=False)
 
         daily_task = collection_model.recurring_tasks[0]
         weekly_task = collection_model.recurring_tasks[1]
@@ -93,7 +97,9 @@ class Tests():
     @staticmethod
     def test_remove_tasks_from_model():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='unit_test_inputs/test_input_file_parse.json')
+        collection_model.import_tasks_from_file(
+            filename='unit_test_inputs/test_input_file_parse.json',
+            revert_changes_on_error=False)
 
         test_equal(len(collection_model.transient_tasks), 1)
         collection_model.remove_task(collection_model.transient_tasks[0])
@@ -117,7 +123,9 @@ class Tests():
     @staticmethod
     def test_output_file_write():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='unit_test_inputs/test_input_file_parse.json')
+        collection_model.import_tasks_from_file(
+            filename='unit_test_inputs/test_input_file_parse.json',
+            revert_changes_on_error=False)
         collection_model.save(filename='unit_test_inputs/test_output_file_write.json')
 
         with open('unit_test_inputs/test_input_file_parse.json', 'r') as input_file, \
@@ -129,7 +137,9 @@ class Tests():
     @staticmethod
     def test_name_conflict():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='unit_test_inputs/test_name_conflict.json')
+        collection_model.import_tasks_from_file(
+            filename='unit_test_inputs/test_name_conflict.json',
+            revert_changes_on_error=False)
         test_equal(len(collection_model.transient_tasks), 1)
         test_equal(len(collection_model.recurring_tasks), 1)
 
@@ -156,7 +166,9 @@ class Tests():
     @staticmethod
     def test_task_overlap_conflict():
         collection_model = TaskCollectionModel()
-        collection_model.load(filename='unit_test_inputs/test_overlapping_tasks.json')
+        collection_model.import_tasks_from_file(
+            filename='unit_test_inputs/test_overlapping_tasks.json',
+            revert_changes_on_error=False)
         test_equal(len(collection_model.transient_tasks), 1)
         test_equal(len(collection_model.recurring_tasks), 1)
 
