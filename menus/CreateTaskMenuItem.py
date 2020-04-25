@@ -12,8 +12,6 @@ from ui_helpers import fields_as_dict, populate_fields
 
 
 class CreateTaskMenuItem(MenuItem):
-    on_select = 'something'
-
     def __init__(self, model: TaskCollectionModel):
         self.model = model
         super().__init__('Create Task', self.create_task_through_ui)
