@@ -111,6 +111,7 @@ class RecurringTask(Task):
         self.cancellations.append(anti_task)
 
     def remove_cancellation(self, anti_task):
+
         try:
             matching_cancellation = next(filter(lambda existing_anti_task: existing_anti_task.start.date == anti_task.start.date, self.cancellations))
         except StopIteration:

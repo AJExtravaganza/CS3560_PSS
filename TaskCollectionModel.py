@@ -25,6 +25,9 @@ class TaskCollectionModel:
         return [cancellation for recurring_task in self.recurring_tasks
                           for cancellation in recurring_task.cancellations]
 
+    def get_recurring_task_instances(self):
+        return [instance for recurring_task in self.recurring_tasks for instance in RecurringTaskInstance.generate_instances(recurring_task)]
+
     def check_name_uniqueness(self, task_name: str):
 
         existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks ] \
@@ -83,19 +86,23 @@ class TaskCollectionModel:
             self.remove_anti_task(task)
 
         if task.__class__ == TransientTask:
-            tasks_to_search = self.transient_tasks
+            task_collection = self.transient_tasks
         elif task.__class__ == RecurringTask:
-            tasks_to_search = self.recurring_tasks
+            task_collection = self.recurring_tasks
         else:
             raise PSSError(f'Unrecognised Task subclass {task.__class__}')
 
         try:
-            matching_task = next(filter(lambda existing_task: existing_task.name == task.name, tasks_to_search))
-            tasks_to_search.remove(matching_task)
+            matching_task = next(filter(lambda existing_task: existing_task.name == task.name, task_collection))
+            task_collection.remove(matching_task)
         except StopIteration:
             raise PSSNoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
 
     def remove_anti_task(self, anti_task: AntiTask, parent_task: RecurringTask=None):
+        removal_conflicts_with_task = anti_task.find_overlapping_task(self.transient_tasks + self.get_recurring_task_instances())
+        if removal_conflicts_with_task is not None:
+            raise PSSInvalidOperationError(f'AntiTask {anti_task.name} overlaps with {removal_conflicts_with_task}')
+
         matching_task = parent_task if parent_task is not None else self.get_recurring_task_having_anti_task(anti_task)
 
         matching_anti_task = next(

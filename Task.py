@@ -52,6 +52,12 @@ class Task:
         else:
             return self_finish > other.start
 
+    def find_overlapping_task(self, tasks):
+        try:
+            return next(filter(lambda other: self.overlaps(other), tasks))
+        except StopIteration:
+            return None
+
     def as_dict(self) -> dict:
         return {
             'Name': self.name,

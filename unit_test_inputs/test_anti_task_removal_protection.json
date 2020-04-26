@@ -1,0 +1,27 @@
+{
+  "tasks": [
+    {
+      "Name": "Recurring",
+      "Type": "Class",
+      "StartDate": 20200101,
+      "StartTime": 0.0,
+      "Duration": 1.0,
+      "EndDate": 20200201,
+      "Frequency": 30
+    },
+    {
+      "Name": "Cancellation",
+      "Type": "Cancellation",
+      "StartDate": 20200201,
+      "StartTime": 0.0,
+      "Duration": 1.0
+    },
+    {
+      "Name": "Transient",
+      "Type": "Visit",
+      "StartDate": 20200201,
+      "StartTime": 0.0,
+      "Duration": 1.0
+    }
+  ]
+}

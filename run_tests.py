@@ -8,6 +8,7 @@ from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
 from TaskCollectionModel import TaskCollectionModel
 from TransientTask import TransientTask
+from exceptions import PSSInvalidOperationError
 
 
 def test(expr: bool):
@@ -121,6 +122,32 @@ class Tests():
         test_equal(len(collection_model.recurring_tasks), 0)
 
     @staticmethod
+    def test_anti_task_removal_protection():
+        collection_model = TaskCollectionModel()
+        collection_model.import_tasks_from_file(
+            filename='unit_test_inputs/test_anti_task_removal_protection.json',
+            revert_changes_on_error=False)
+
+        test_equal(len(collection_model.recurring_tasks[0].generate_recurrence_datetimes()), 1)
+
+        try:
+            anti_task = collection_model.recurring_tasks[0].cancellations[0]
+            collection_model.remove_anti_task(anti_task)
+        except PSSInvalidOperationError:
+            pass
+
+        test_equal(len(collection_model.transient_tasks), 1)
+        test_equal(len(collection_model.recurring_tasks[0].generate_recurrence_datetimes()), 1)
+
+        collection_model.remove_task(collection_model.transient_tasks[0])
+        anti_task = collection_model.recurring_tasks[0].cancellations[0]
+        collection_model.recurring_tasks[0].remove_cancellation(anti_task)
+
+
+        test_equal(len(collection_model.transient_tasks), 0)
+        test_equal(len(collection_model.recurring_tasks[0].generate_recurrence_datetimes()), 2)
+
+    @staticmethod
     def test_output_file_write():
         collection_model = TaskCollectionModel()
         collection_model.import_tasks_from_file(
@@ -177,6 +204,7 @@ Tests.test_input_file_parse()
 Tests.test_add_tasks_to_model()
 Tests.test_recurring_task_instance_generation()
 Tests.test_remove_tasks_from_model()
+Tests.test_anti_task_removal_protection()
 Tests.test_output_file_write()
 Tests.test_name_conflict()
 Tests.test_task_overlap_detection()
