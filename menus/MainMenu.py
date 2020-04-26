@@ -4,6 +4,7 @@ from menus.CreateTaskMenuItem import CreateTaskMenuItem
 from menus.DeleteTaskMenuItem import DeleteTaskMenuItem
 from menus.EditTaskMenuItem import EditTaskMenuItem
 from menus.ExportDataMenuItem import ExportDataMenuItem
+from menus.ImportDataMenuItem import ImportDataMenuItem
 from menus.ViewTaskMenuItem import ViewTaskMenuItem
 
 
@@ -16,7 +17,7 @@ class MainMenu(Menu):
             DeleteTaskMenuItem(model),
             EditTaskMenuItem(model),
             ExportDataMenuItem(model),
-            # LoadScheduleMenuItem,
+            ImportDataMenuItem(model),
             # ViewScheduleMenuItem,
             # ExportScheduleMenuItem,
         ])

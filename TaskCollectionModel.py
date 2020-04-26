@@ -111,7 +111,7 @@ class TaskCollectionModel:
 
         matching_task.remove_cancellation(matching_anti_task)
 
-    def import_tasks_from_file(self, **kwargs):
+    def import_task_data_from_file(self, **kwargs):
         filename = kwargs.get('filename', 'schedule.json')
         revert_changes_on_error = kwargs.get('revert_changes_on_error', True)
         file_handler = FileHandler(filename)
@@ -133,7 +133,7 @@ class TaskCollectionModel:
         recurring_tasks_by_name = {}
         recurring_tasks_by_name.update([(task.name, task) for task in self.recurring_tasks])
 
-    def save(self, **kwargs):
+    def write_task_data_to_file(self, **kwargs):
         filename = kwargs.get('filename', 'schedule.json')
         file_handler = FileHandler(filename)
         tasks = self.transient_tasks + self.recurring_tasks + generate_anti_tasks(self.recurring_tasks)
