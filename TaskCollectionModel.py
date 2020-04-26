@@ -2,7 +2,6 @@ import copy
 from typing import List
 
 from AntiTask import AntiTask
-from Cancellation import Cancellation
 from FileHandler import FileHandler
 from RecurringTask import RecurringTask
 from RecurringTaskInstance import RecurringTaskInstance
@@ -13,8 +12,8 @@ from exceptions import TaskNameNotUniqueError, TaskOverlapError, NoAntiTaskMatch
 
 
 def generate_anti_tasks(recurring_tasks: List[RecurringTask]) -> List[AntiTask]:
-    return [AntiTask.from_recurring_task(recurring_task, cancellation) for recurring_task in recurring_tasks for
-            cancellation in recurring_task.cancellations]
+    return [anti_task for recurring_task in recurring_tasks for
+            anti_task in recurring_task.cancellations]
 
 
 class TaskCollectionModel:
@@ -22,14 +21,14 @@ class TaskCollectionModel:
         self.transient_tasks: List[TransientTask] = []
         self.recurring_tasks: List[RecurringTask] = []
 
-    def get_all_cancellations(self):
+    def get_all_anti_tasks(self):
         return [cancellation for recurring_task in self.recurring_tasks
                           for cancellation in recurring_task.cancellations]
 
     def check_name_uniqueness(self, task_name: str):
 
         existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks ] \
-                         + [cancellation.name for cancellation in self.get_all_cancellations()]
+                         + [cancellation.name for cancellation in self.get_all_anti_tasks()]
         if task_name in existing_names:
             raise TaskNameNotUniqueError(f'Task with name {task_name} already exists')
 
@@ -45,13 +44,13 @@ class TaskCollectionModel:
     def get_task_by_name(self, target_task_name: str):
         try:
             return filter(lambda task: task.name == target_task_name,
-                          self.transient_tasks + self.recurring_tasks).__next__()
+                          self.transient_tasks + self.recurring_tasks + self.get_all_anti_tasks()).__next__()
         except StopIteration:
             raise PSSNoExistingTaskMatchError(f'No task with name {target_task_name} exists in records.')
 
     def add_task(self, task: Task):
         if task.__class__ == AntiTask:
-            self.add_cancellation(task)
+            self.add_anti_task(task)
             return
 
         self.check_name_uniqueness(task.name)
@@ -64,20 +63,24 @@ class TaskCollectionModel:
         else:
             raise RuntimeError(f'Unrecognised task class {task.__class__} in TaskCollectionModel::add_task()')
 
-    def add_cancellation(self, anti_task: AntiTask):
+    def add_anti_task(self, anti_task: AntiTask):
         try:
             self.check_name_uniqueness(anti_task.name)
-            matching_task = next(
+            matching_recurring_task = next(
                 filter(lambda recurring_task: anti_task.matches(recurring_task), self.recurring_tasks))
         except StopIteration:
             raise NoAntiTaskMatchError(
                 f'No task matching Antitask with start={anti_task.start}, duration={anti_task.duration_minutes}min')
 
-        matching_task.add_cancellation(Cancellation(anti_task.start.date(), anti_task.name))
+        matching_recurring_task.add_anti_task(anti_task)
+
+    def get_recurring_task_having_anti_task(self, anti_task: AntiTask):
+        return next(filter(lambda recurring_task: recurring_task.has_cancellation_with_name(anti_task.name),
+                           self.recurring_tasks))
 
     def remove_task(self, task: Task):
         if task.__class__ == AntiTask:
-            self.remove_cancellation(task)
+            self.remove_anti_task(task)
 
         if task.__class__ == TransientTask:
             tasks_to_search = self.transient_tasks
@@ -92,15 +95,13 @@ class TaskCollectionModel:
         except StopIteration:
             raise PSSNoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
 
-    def remove_cancellation(self, cancellation_name: str):
-        def contains_cancellation_with_name(task: RecurringTask, name: str):
-            return len(list(filter(lambda cancellation: cancellation.name == cancellation_name, task.cancellations)))
+    def remove_anti_task(self, anti_task: AntiTask, parent_task: RecurringTask=None):
+        matching_task = parent_task if parent_task is not None else self.get_recurring_task_having_anti_task(anti_task)
 
-        matching_task = next(
-            filter(lambda task: contains_cancellation_with_name(task, cancellation_name), self.recurring_tasks))
-        matching_cancellation = next(
-            filter(lambda cancellation: cancellation.name == cancellation_name, matching_task.cancellations))
-        matching_task.remove_cancellation(matching_cancellation.date)
+        matching_anti_task = next(
+            filter(lambda candidate_anti_task: candidate_anti_task.name == anti_task.name, matching_task.cancellations))
+
+        matching_task.remove_cancellation(matching_anti_task)
 
     def import_tasks_from_file(self, **kwargs):
         filename = kwargs.get('filename', 'schedule.json')
