@@ -6,10 +6,10 @@ from TaskCollectionModel import TaskCollectionModel
 from exceptions import PSSInvalidOperationError
 
 
-class SaveScheduleMenuItem(MenuItem):
+class ExportDataMenuItem(MenuItem):
     def __init__(self, model: TaskCollectionModel):
         self.model = model
-        super().__init__('Save Data To File', self.save_schedule, )
+        super().__init__('Export Data To File', self.save_schedule, )
 
     def save_schedule(self):
         filename_field = Field('filename', 'filename',)
