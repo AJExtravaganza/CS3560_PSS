@@ -22,10 +22,14 @@ class TaskCollectionModel:
         self.transient_tasks: List[TransientTask] = []
         self.recurring_tasks: List[RecurringTask] = []
 
-    def check_name_uniqueness(self, task_name: str):
-        antitask_names = [cancellation.name for recurring_task in self.recurring_tasks
+    def get_all_cancellations(self):
+        return [cancellation for recurring_task in self.recurring_tasks
                           for cancellation in recurring_task.cancellations]
-        existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks ] + antitask_names
+
+    def check_name_uniqueness(self, task_name: str):
+
+        existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks ] \
+                         + [cancellation.name for cancellation in self.get_all_cancellations()]
         if task_name in existing_names:
             raise TaskNameNotUniqueError(f'Task with name {task_name} already exists')
 
