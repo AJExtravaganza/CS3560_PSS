@@ -84,6 +84,7 @@ class TaskCollectionModel:
     def remove_task(self, task: Task):
         if task.__class__ == AntiTask:
             self.remove_anti_task(task)
+            return
 
         if task.__class__ == TransientTask:
             task_collection = self.transient_tasks
