@@ -3,6 +3,7 @@ from calendar import monthrange
 from datetime import date, datetime, timedelta
 from typing import List
 
+from Cancellation import Cancellation
 from Field import Field
 from Task import Task
 from enum_RecurrenceFrequency import RecurrenceFrequency
@@ -13,7 +14,7 @@ from field_validators import validate_date_string, validate_recurrence_frequency
 class RecurringTask(Task):
     end_date: date
     frequency: RecurrenceFrequency
-    cancellations: List[date]
+    cancellations: List[Cancellation]
     valid_types = {
         'Class',
         'Study',
@@ -71,7 +72,7 @@ class RecurringTask(Task):
         recurrences = []
 
         while current_datetime.date() <= self.end_date:
-            if current_datetime.date() not in self.cancellations:
+            if current_datetime.date() not in [cancellation.date for cancellation in self.cancellations]:
                 recurrences.append(current_datetime)
 
             if self.frequency == RecurrenceFrequency.DAILY:
@@ -100,16 +101,19 @@ class RecurringTask(Task):
 
         return dt in self.generate_recurrence_datetimes()
 
-    def add_cancellation(self, d: date):
-        dt = datetime(year=d.year, month=d.month, day=d.day).replace(hour=self.start.hour, minute=self.start.minute)
-        if not self.coincides_with(dt):
-            raise PSSValidationError(
-                f'date {d} does not coincide with start_date={self.start.date()}, frequency={self.frequency}')
+    def add_cancellation(self, cancellation):
+        cancellation_datetime = datetime(year=cancellation.date.year, month=cancellation.date.month, day=cancellation.date.day).replace(hour=self.start.hour, minute=self.start.minute)
 
-        self.cancellations.append(d)
+        if not self.coincides_with(cancellation_datetime):
+            raise PSSValidationError(
+                f'date {cancellation.date} does not coincide with start_date={self.start.date()}, frequency={self.frequency}')
+
+        self.cancellations.append(cancellation)
 
     def remove_cancellation(self, cancellation_date: date):
-        if cancellation_date not in self.cancellations:
+        try:
+            matching_cancellation = next(filter(lambda cancellation: cancellation.date == cancellation_date, self.cancellations))
+        except StopIteration:
             raise PSSValidationError(f'Task "{self.name} has no existing cancellation on {cancellation_date}"')
 
-        self.cancellations.remove(cancellation_date)
+        self.cancellations.remove(matching_cancellation)

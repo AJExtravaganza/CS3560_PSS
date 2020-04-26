@@ -109,7 +109,7 @@ class Tests():
         test_equal(len(collection_model.recurring_tasks[0].cancellations), 1)
         recurring_task = collection_model.recurring_tasks[0]
         anti_task = AntiTask.from_recurring_task(recurring_task, recurring_task.cancellations[0])
-        collection_model.remove_cancellation(anti_task)
+        collection_model.remove_cancellation(anti_task.name)
         test_equal(len(collection_model.recurring_tasks[0].cancellations), 0)
         test_equal(collection_model.recurring_tasks[0].generate_recurrence_datetimes(), [
             datetime(year=2020, month=1, day=31, hour=10),

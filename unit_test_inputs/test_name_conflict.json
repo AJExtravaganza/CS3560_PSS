@@ -22,7 +22,7 @@
       "StartDate": 20220101,
       "StartTime": 10.0,
       "Duration": 1.0,
-      "EndDate": 20210101,
+      "EndDate": 20220201,
       "Frequency": 30
     },
     {
@@ -30,6 +30,13 @@
       "Type": "Appointment",
       "StartDate": 20200102,
       "StartTime": 0.0,
+      "Duration": 1.0
+    },
+    {
+      "Name": "Doppelganger",
+      "Type": "Cancellation",
+      "StartDate": 20200201,
+      "StartTime": 10.0,
       "Duration": 1.0
     }
   ]

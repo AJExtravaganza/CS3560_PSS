@@ -2,6 +2,7 @@ import copy
 from typing import List
 
 from AntiTask import AntiTask
+from Cancellation import Cancellation
 from FileHandler import FileHandler
 from RecurringTask import RecurringTask
 from RecurringTaskInstance import RecurringTaskInstance
@@ -12,8 +13,8 @@ from exceptions import TaskNameNotUniqueError, TaskOverlapError, NoAntiTaskMatch
 
 
 def generate_anti_tasks(recurring_tasks: List[RecurringTask]) -> List[AntiTask]:
-    return [AntiTask.from_recurring_task(recurring_task, dt) for recurring_task in recurring_tasks for dt in
-            recurring_task.cancellations]
+    return [AntiTask.from_recurring_task(recurring_task, cancellation) for recurring_task in recurring_tasks for
+            cancellation in recurring_task.cancellations]
 
 
 class TaskCollectionModel:
@@ -21,10 +22,12 @@ class TaskCollectionModel:
         self.transient_tasks: List[TransientTask] = []
         self.recurring_tasks: List[RecurringTask] = []
 
-    def check_name_uniqueness(self, task: Task):
-        existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks]
-        if task.name in existing_names:
-            raise TaskNameNotUniqueError(f'Task with name {task.name} already exists')
+    def check_name_uniqueness(self, task_name: str):
+        antitask_names = [cancellation.name for recurring_task in self.recurring_tasks
+                          for cancellation in recurring_task.cancellations]
+        existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks ] + antitask_names
+        if task_name in existing_names:
+            raise TaskNameNotUniqueError(f'Task with name {task_name} already exists')
 
     def check_for_overlap_with_existing_task(self, new_task: Task):
         existing_tasks = self.transient_tasks + [instance for recurring_task in self.recurring_tasks for instance in
@@ -37,7 +40,8 @@ class TaskCollectionModel:
 
     def get_task_by_name(self, target_task_name: str):
         try:
-            return filter(lambda task: task.name == target_task_name, self.transient_tasks + self.recurring_tasks).__next__()
+            return filter(lambda task: task.name == target_task_name,
+                          self.transient_tasks + self.recurring_tasks).__next__()
         except StopIteration:
             raise PSSNoExistingTaskMatchError(f'No task with name {target_task_name} exists in records.')
 
@@ -46,7 +50,7 @@ class TaskCollectionModel:
             self.add_cancellation(task)
             return
 
-        self.check_name_uniqueness(task)
+        self.check_name_uniqueness(task.name)
         self.check_for_overlap_with_existing_task(task)
 
         if task.__class__ == TransientTask:
@@ -58,17 +62,14 @@ class TaskCollectionModel:
 
     def add_cancellation(self, anti_task: AntiTask):
         try:
+            self.check_name_uniqueness(anti_task.name)
             matching_task = next(
-                filter(lambda recurring_task: recurring_task.name == anti_task.name, self.recurring_tasks))
+                filter(lambda recurring_task: anti_task.matches(recurring_task), self.recurring_tasks))
         except StopIteration:
-            raise NoAntiTaskMatchError(f'No task matching Antitask with name {anti_task.name}')
-
-        if matching_task.coincides_with(
-                anti_task.start) and matching_task.duration_minutes == anti_task.duration_minutes:
-            matching_task.add_cancellation(anti_task.start.date())
-        else:
             raise NoAntiTaskMatchError(
-                f'No task matching Antitask with name {anti_task.name} coinciding with start={anti_task.start} and duration_minutes={anti_task.duration_minutes}')
+                f'No task matching Antitask with start={anti_task.start}, duration={anti_task.duration_minutes}min')
+
+        matching_task.add_cancellation(Cancellation(anti_task.start.date(), anti_task.name))
 
     def remove_task(self, task: Task):
         if task.__class__ == AntiTask:
@@ -87,9 +88,15 @@ class TaskCollectionModel:
         except StopIteration:
             raise PSSNoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
 
-    def remove_cancellation(self, anti_task: AntiTask):
-        matching_task = next(filter(lambda existing_task: existing_task.name == anti_task.name, self.recurring_tasks))
-        matching_task.remove_cancellation(anti_task.start.date())
+    def remove_cancellation(self, cancellation_name: str):
+        def contains_cancellation_with_name(task: RecurringTask, name: str):
+            return len(list(filter(lambda cancellation: cancellation.name == cancellation_name, task.cancellations)))
+
+        matching_task = next(
+            filter(lambda task: contains_cancellation_with_name(task, cancellation_name), self.recurring_tasks))
+        matching_cancellation = next(
+            filter(lambda cancellation: cancellation.name == cancellation_name, matching_task.cancellations))
+        matching_task.remove_cancellation(matching_cancellation.date)
 
     def import_tasks_from_file(self, **kwargs):
         filename = kwargs.get('filename', 'schedule.json')

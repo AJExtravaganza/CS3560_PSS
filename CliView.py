@@ -16,7 +16,7 @@ class CliView:
         for key, value in task.as_ordered_dict().items():
             print(f'{key}: {value}')
         if type(task) is RecurringTask:
-            print(f"Cancellations: {[int(cancellation.strftime('%Y%m%d')) for cancellation in task.cancellations]}")
+            print(f"Cancellations: {[int(cancellation.date.strftime('%Y%m%d')) for cancellation in task.cancellations]}")
 
 
     @classmethod
