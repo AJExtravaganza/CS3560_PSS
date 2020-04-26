@@ -2,6 +2,7 @@ from typing import Type
 
 from AntiTask import AntiTask
 from CliController import CliController
+from CliView import CliView
 from Menu import Menu
 from MenuItem import MenuItem
 from RecurringTask import RecurringTask
@@ -39,4 +40,4 @@ class CreateTaskMenuItem(MenuItem):
         except PSSValidationError as err:
             raise PSSInvalidOperationError(f'Could not complete operation: {err}')
 
-        print(f'Successfully added {task}')
+        CliView.display_notification(f'Successfully added {task}')

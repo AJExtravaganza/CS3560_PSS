@@ -2,6 +2,7 @@ from Menu import Menu
 from TaskCollectionModel import TaskCollectionModel
 from menus.CreateTaskMenuItem import CreateTaskMenuItem
 from menus.DeleteTaskMenuItem import DeleteTaskMenuItem
+from menus.EditTaskMenuItem import EditTaskMenuItem
 from menus.ViewTaskMenuItem import ViewTaskMenuItem
 
 
@@ -12,7 +13,7 @@ class MainMenu(Menu):
             CreateTaskMenuItem(model),
             ViewTaskMenuItem(model),
             DeleteTaskMenuItem(model),
-            # EditTaskMenuItem,
+            EditTaskMenuItem(model),
             # SaveScheduleMenuItem,
             # LoadScheduleMenuItem,
             # ViewScheduleMenuItem,
