@@ -44,3 +44,9 @@ def validate_value_in_list(value, allowable_values: List):
 
 def validate_recurrence_frequency(value: str):
     validate_value_in_list(int(value), [enum.value for enum in RecurrenceFrequency])
+
+def validate_data_filename(value: str):
+    if not value.endswith('.json'):
+        raise ValueError('Filename must specify extension ".json"')
+    if value == '.json':
+        raise ValueError('Filename must consist of a non-empty string and a .json suffix')

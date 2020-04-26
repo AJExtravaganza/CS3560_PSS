@@ -9,7 +9,8 @@ class Field:
 
     def set(self, value):
         try:
-            self.validator(value)
+            if self.validator is not None:
+                self.validator(value)
             self.value = value
         except ValueError:
             raise ValueError(f'Value {value} does not conform to {self.validation_pattern_message}')
