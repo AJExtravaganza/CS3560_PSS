@@ -1,11 +1,12 @@
 from typing import List
 
+from CliView import CliView
 from MenuItem import MenuItem
 from MenuView import MenuView
 from exceptions import PSSError, PSSInvalidOperationError
 
 
-class InvalidUserMenuSelectionError(ValueError):
+class PSSInvalidUserMenuSelectionError(ValueError):
     pass
 
 class Menu:
@@ -14,20 +15,19 @@ class Menu:
         self.prompt = prompt
 
     def process(self):
-        view = MenuView(self.items, self.prompt)
-        view.display()
+        CliView.display_menu(self)
 
         selection = None
         while selection is None:
             try:
                 selection = self.get_user_selection()
-            except InvalidUserMenuSelectionError:
-                view.display_invalid_selection_error()
+            except PSSInvalidUserMenuSelectionError:
+                CliView.display_invalid_selection_error()
 
         try:
             return self.items[selection].process()
         except PSSInvalidOperationError as err:
-            view.display_exception(err)
+            CliView.display_exception(err)
 
     def get_user_selection(self) -> int:
         def valid_selection(raw_selection: int):
@@ -40,6 +40,6 @@ class Menu:
             if not valid_selection(selection):
                 raise ValueError
         except ValueError:
-            raise InvalidUserMenuSelectionError()
+            raise PSSInvalidUserMenuSelectionError()
 
         return selection

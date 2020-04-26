@@ -1,6 +1,7 @@
 from Menu import Menu
 from TaskCollectionModel import TaskCollectionModel
 from menus.CreateTaskMenuItem import CreateTaskMenuItem
+from menus.ViewTaskMenuItem import ViewTaskMenuItem
 
 
 class MainMenu(Menu):
@@ -8,7 +9,7 @@ class MainMenu(Menu):
         self.model = model
         super().__init__([
             CreateTaskMenuItem(model),
-            # ViewTaskMenuItem,
+            ViewTaskMenuItem(model),
             # DeleteTaskMenuItem,
             # EditTaskMenuItem,
             # SaveScheduleMenuItem,

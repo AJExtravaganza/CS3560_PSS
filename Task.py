@@ -1,4 +1,4 @@
-from collections import Set
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from math import floor
 from typing import List
@@ -52,7 +52,7 @@ class Task:
         else:
             return self_finish > other.start
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             'Name': self.name,
             'Type': self.type,
@@ -60,6 +60,9 @@ class Task:
             'StartTime': self.start.hour + self.start.minute / 60,
             'Duration': self.duration_minutes / 60
         }
+
+    def as_ordered_dict(self) -> OrderedDict:
+        return OrderedDict([(item[0], item[1]) for item in self.as_dict().items()])
 
     @classmethod
     def get_input_fields(cls) -> List[Field]:

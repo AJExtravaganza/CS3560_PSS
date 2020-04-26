@@ -53,7 +53,7 @@ class RecurringTask(Task):
         base = super(RecurringTask, self).as_dict()
         base.update({
             'EndDate': int(self.end_date.strftime('%Y%m%d')),
-            'Frequency': self.frequency.value
+            'Frequency': self.frequency.value,
         })
         return base
 

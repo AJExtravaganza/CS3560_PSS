@@ -31,5 +31,5 @@ class NoAntiTaskMatchError(TaskInsertionError):
     pass
 
 
-class NoExistingTaskMatchError(PSSValidationError):
+class PSSNoExistingTaskMatchError(PSSValidationError):
     pass

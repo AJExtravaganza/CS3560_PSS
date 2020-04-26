@@ -8,7 +8,7 @@ from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
 from TransientTask import TransientTask
 from exceptions import TaskNameNotUniqueError, TaskOverlapError, NoAntiTaskMatchError, PSSError, \
-    NoExistingTaskMatchError, TaskInsertionError, PSSInvalidOperationError
+    PSSNoExistingTaskMatchError, TaskInsertionError, PSSInvalidOperationError
 
 
 def generate_anti_tasks(recurring_tasks: List[RecurringTask]) -> List[AntiTask]:
@@ -34,6 +34,12 @@ class TaskCollectionModel:
         for new_task_instance in new_task_instances:
             if any([True for existing_task in existing_tasks if new_task_instance.overlaps(existing_task)]):
                 raise TaskOverlapError(f'New task overlaps existing task')
+
+    def get_task_by_name(self, target_task_name: str):
+        try:
+            return filter(lambda task: task.name == target_task_name, self.transient_tasks + self.recurring_tasks).__next__()
+        except StopIteration:
+            raise PSSNoExistingTaskMatchError(f'No task with name {target_task_name} exists in records.')
 
     def add_task(self, task: Task):
         if task.__class__ == AntiTask:
@@ -79,7 +85,7 @@ class TaskCollectionModel:
             matching_task = next(filter(lambda existing_task: existing_task.name == task.name, tasks_to_search))
             tasks_to_search.remove(matching_task)
         except StopIteration:
-            raise NoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
+            raise PSSNoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
 
     def remove_cancellation(self, anti_task: AntiTask):
         matching_task = next(filter(lambda existing_task: existing_task.name == anti_task.name, self.recurring_tasks))

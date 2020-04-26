@@ -1,6 +1,7 @@
 from typing import Type
 
 from AntiTask import AntiTask
+from CliController import CliController
 from Menu import Menu
 from MenuItem import MenuItem
 from RecurringTask import RecurringTask
@@ -8,7 +9,6 @@ from Task import Task
 from TaskCollectionModel import TaskCollectionModel
 from TransientTask import TransientTask
 from exceptions import PSSValidationError, PSSInvalidOperationError
-from ui_helpers import fields_as_dict, populate_fields
 
 
 class CreateTaskMenuItem(MenuItem):
@@ -30,8 +30,8 @@ class CreateTaskMenuItem(MenuItem):
             raise RuntimeError('Invalid task type resulting from CreateTaskMenuItem.create_task_through_ui()')
 
         fields = task_create_type.get_input_fields()
-        populate_fields(fields)
-        field_values = fields_as_dict(fields)
+        CliController.populate_fields(fields)
+        field_values = CliController.fields_as_dict(fields)
 
         task = task_create_type(field_values)
         try:
