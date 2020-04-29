@@ -4,6 +4,7 @@ from typing import List
 
 from Field import Field
 from Task import Task
+from datetime_helpers import increment_month, days_in_month
 from enum_RecurrenceFrequency import RecurrenceFrequency
 from exceptions import PSSValidationError
 from field_validators import validate_date_string, validate_recurrence_frequency
@@ -56,15 +57,6 @@ class RecurringTask(Task):
         return base
 
     def generate_recurrence_datetimes(self):
-        def days_in_month(year: int, month: int):
-            return monthrange(year, month)[1]
-
-        def increment_month(dt: datetime):
-            year = dt.year if dt.month != 12 else (dt.year + 1)
-            month = (dt.month + 1) if dt.month != 12 else 1
-            day = min(dt.day, days_in_month(year, month))
-            return dt.replace(year=year, month=month, day=day)
-
         current_datetime = self.start
         recurrences = []
 

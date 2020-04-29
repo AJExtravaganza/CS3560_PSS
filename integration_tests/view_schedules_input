@@ -7,6 +7,32 @@ Visit
 1
 
 0
+0
+someLaterTask
+Appointment
+20200103
+0
+1
+
+
+0
+0
+THISSHOULDDISPLAYFORMONTH
+Appointment
+20200131
+0
+1
+
+
+0
+0
+THISSHOULDNOTDISPLAYFORMONTH
+Appointment
+20200201
+0
+1
+
+0
 1
 recTask
 Sleep
@@ -18,4 +44,12 @@ Sleep
 
 6
 0
+20200101
+
+6
+1
+20200101
+
+6
+2
 20200101

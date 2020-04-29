@@ -31,14 +31,15 @@ class CliView:
 
     @classmethod
     def display_task_as_schedule_entry(cls, task: TaskInstance, prefix: str = ''):
+
         print(f'{prefix}{task.start.strftime("%H:%M")}-{task.end().strftime("%H:%M")}: {task.name} [{task.type}]')
 
     @classmethod
-    def display_schedule_chunk(cls, tasks: List[TaskInstance], preamble=None):
+    def display_schedule_chunk(cls, tasks: List[TaskInstance], preamble=None, per_task_prefix=''):
         if preamble is not None:
             print(preamble)
         for task in tasks:
-            cls.display_task_as_schedule_entry(task)
+            cls.display_task_as_schedule_entry(task, per_task_prefix)
 
     @classmethod
     def display_exception(cls, err: Exception):

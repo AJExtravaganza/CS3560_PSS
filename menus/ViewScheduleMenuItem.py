@@ -6,8 +6,10 @@ from DailyScheduleView import DailyScheduleView
 from Field import Field
 from Menu import Menu
 from MenuItem import MenuItem
+from MonthlyScheduleView import MonthlyScheduleView
 from Task import Task
 from TaskCollectionModel import TaskCollectionModel
+from WeeklyScheduleView import WeeklyScheduleView
 from field_validators import validate_date_string
 
 
@@ -20,8 +22,8 @@ class ViewScheduleMenuItem(MenuItem):
         ScheduleViewType: Type[Union[DailyScheduleView,]] = Menu(
             [
                 MenuItem('Daily Schedule', lambda: DailyScheduleView),
-                # MenuItem('Weekly Schedule', lambda: RecurringTask),
-                # MenuItem('Monthly Schedule', lambda: AntiTask)
+                MenuItem('Weekly Schedule', lambda: WeeklyScheduleView),
+                MenuItem('Monthly Schedule', lambda: MonthlyScheduleView)
             ],
             'What type of schedule would you like to view?',
         ).process()
