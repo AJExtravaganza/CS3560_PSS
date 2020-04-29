@@ -1,0 +1,1 @@
+{"tasks": [{"Name": "someTask", "Type": "Visit", "StartDate": 20200101, "StartTime": 0.0, "Duration": 1.0}, {"Name": "someLaterTask", "Type": "Appointment", "StartDate": 20200103, "StartTime": 0.0, "Duration": 1.0}, {"Name": "recTask", "Type": "Sleep", "StartDate": 20200101, "StartTime": 12.0, "Duration": 1.0}]}

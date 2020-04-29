@@ -156,3 +156,9 @@ class TaskCollectionModel:
         file_handler = FileHandler(filename)
         tasks = self.transient_tasks + self.recurring_tasks + generate_anti_tasks(self.recurring_tasks)
         file_handler.write_tasks(tasks)
+
+    def write_task_instances_to_file(self, **kwargs):
+        filename = kwargs.get('filename', 'schedule.json')
+        tasks = kwargs.get('task_instances', self.get_task_instances())
+        file_handler = FileHandler(filename)
+        file_handler.write_tasks(tasks)
