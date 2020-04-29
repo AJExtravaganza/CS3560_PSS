@@ -28,6 +28,9 @@ class TaskCollectionModel:
     def get_recurring_task_instances(self):
         return [instance for recurring_task in self.recurring_tasks for instance in RecurringTaskInstance.generate_instances(recurring_task)]
 
+    def get_task_instances(self):
+        return self.transient_tasks + self.get_recurring_task_instances()
+
     def check_name_uniqueness(self, task_name: str):
 
         existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks ] \

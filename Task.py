@@ -44,6 +44,9 @@ class Task:
     def __lt__(self, other):
         return self.start < other.start
 
+    def end(self):
+        return self.start + timedelta(minutes=self.duration_minutes)
+
     def overlaps(self, other):
         self_finish = self.start + timedelta(minutes=self.duration_minutes)
         other_finish = other.start + timedelta(minutes=other.duration_minutes)
