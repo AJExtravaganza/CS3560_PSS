@@ -1,4 +1,5 @@
 import copy
+from datetime import date, timedelta
 from typing import List
 
 from AntiTask import AntiTask
@@ -8,6 +9,7 @@ from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
 from TaskInstance import TaskInstance
 from TransientTask import TransientTask
+from datetime_helpers import first_of_month, last_of_month
 from exceptions import TaskNameNotUniqueError, TaskOverlapError, NoAntiTaskMatchError, PSSError, \
     PSSNoExistingTaskMatchError, TaskInsertionError, PSSInvalidOperationError
 
@@ -24,17 +26,30 @@ class TaskCollectionModel:
 
     def get_all_anti_tasks(self):
         return [cancellation for recurring_task in self.recurring_tasks
-                          for cancellation in recurring_task.cancellations]
+                for cancellation in recurring_task.cancellations]
 
     def get_recurring_task_instances(self) -> List[RecurringTaskInstance]:
-        return [instance for recurring_task in self.recurring_tasks for instance in RecurringTaskInstance.generate_instances(recurring_task)]
+        return [instance for recurring_task in self.recurring_tasks for instance in
+                RecurringTaskInstance.generate_instances(recurring_task)]
 
     def get_task_instances(self) -> List[TaskInstance]:
         return self.transient_tasks + self.get_recurring_task_instances()
 
+    def get_task_instances_for_range(self, start_date: date, inclusive_end_date: date):
+        return filter(lambda task: start_date <= task.start.date() <= inclusive_end_date, self.get_task_instances())
+
+    def get_task_instances_for_date(self, target_date: date):
+        return self.get_task_instances_for_range(target_date, target_date)
+
+    def get_task_instances_for_week_starting(self, start_date: date):
+        return self.get_task_instances_for_range(start_date, start_date + timedelta(days=6))
+
+    def get_task_instances_for_month(self, date_in_month: date):
+        return self.get_task_instances_for_range(first_of_month(date_in_month), last_of_month(date_in_month))
+
     def check_name_uniqueness(self, task_name: str):
 
-        existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks ] \
+        existing_names = [task.name for task in self.transient_tasks + self.recurring_tasks] \
                          + [cancellation.name for cancellation in self.get_all_anti_tasks()]
         if task_name in existing_names:
             raise TaskNameNotUniqueError(f'Task with name {task_name} already exists')
@@ -102,7 +117,7 @@ class TaskCollectionModel:
         except StopIteration:
             raise PSSNoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
 
-    def remove_anti_task(self, anti_task: AntiTask, parent_task: RecurringTask=None):
+    def remove_anti_task(self, anti_task: AntiTask, parent_task: RecurringTask = None):
         removal_conflicts_with_task = anti_task.find_overlapping_task(self.get_task_instances())
         if removal_conflicts_with_task is not None:
             raise PSSInvalidOperationError(f'AntiTask {anti_task.name} overlaps with {removal_conflicts_with_task}')

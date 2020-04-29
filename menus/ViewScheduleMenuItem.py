@@ -1,15 +1,12 @@
 from datetime import datetime
-from typing import Type, Union
+from typing import Type, Union, List
 
 from CliController import CliController
-from DailyScheduleView import DailyScheduleView
 from Field import Field
 from Menu import Menu
 from MenuItem import MenuItem
-from MonthlyScheduleView import MonthlyScheduleView
-from Task import Task
+from ScheduleView import ScheduleView
 from TaskCollectionModel import TaskCollectionModel
-from WeeklyScheduleView import WeeklyScheduleView
 from field_validators import validate_date_string
 
 
@@ -19,11 +16,11 @@ class ViewScheduleMenuItem(MenuItem):
         super().__init__('View Schedule', self.view_schedule_through_ui)
 
     def view_schedule_through_ui(self):
-        ScheduleViewType: Type[Union[DailyScheduleView,]] = Menu(
+        get_schedule_tasks = Menu(
             [
-                MenuItem('Daily Schedule', lambda: DailyScheduleView),
-                MenuItem('Weekly Schedule', lambda: WeeklyScheduleView),
-                MenuItem('Monthly Schedule', lambda: MonthlyScheduleView)
+                MenuItem('Daily Schedule', lambda : lambda start_date: self.model.get_task_instances_for_date(start_date)),
+                MenuItem('Weekly Schedule', lambda : lambda start_date: self.model.get_task_instances_for_week_starting(start_date)),
+                MenuItem('Monthly Schedule', lambda : lambda start_date: self.model.get_task_instances_for_month(start_date))
             ],
             'What type of schedule would you like to view?',
         ).process()
@@ -36,5 +33,6 @@ class ViewScheduleMenuItem(MenuItem):
         )
         CliController.populate_field(start_date_field)
 
-        view = ScheduleViewType(self.model.get_task_instances(), start_date_field.value)
+        tasks = get_schedule_tasks(start_date_field.value)
+        view = ScheduleView(tasks)
         view.display()
