@@ -1,10 +1,10 @@
 from typing import List
 
 from Field import Field
-from Task import Task
+from TaskInstance import TaskInstance
 
 
-class TransientTask(Task):
+class TransientTask(TaskInstance):
     valid_types = {
         'Visit',
         'Shopping',
