@@ -27,7 +27,7 @@ class CreateTaskMenuItem(MenuItem):
             'What type of task would you like to create?',
         ).process()
 
-        if not task_create_type.__base__ == Task:
+        if Task not in type.mro(task_create_type):
             raise RuntimeError('Invalid task type resulting from CreateTaskMenuItem.create_task_through_ui()')
 
         fields = task_create_type.get_input_fields()

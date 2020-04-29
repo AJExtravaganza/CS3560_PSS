@@ -1,9 +1,8 @@
-from typing import List, Union
+from typing import List
 
 from RecurringTask import RecurringTask
-from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
-from TransientTask import TransientTask
+from TaskInstance import TaskInstance
 
 
 class CliView:
@@ -31,11 +30,11 @@ class CliView:
                 f"Cancellations: {[int(cancellation.start.date().strftime('%Y%m%d')) for cancellation in task.cancellations]}")
 
     @classmethod
-    def display_task_as_schedule_entry(cls, task: Union[TransientTask, RecurringTaskInstance], prefix: str = ''):
+    def display_task_as_schedule_entry(cls, task: TaskInstance, prefix: str = ''):
         print(f'{prefix}{task.start.strftime("%H:%M")}-{task.end().strftime("%H:%M")}: {task.name} [{task.type}]')
 
     @classmethod
-    def display_schedule_chunk(cls, tasks: List[Union[TransientTask, RecurringTaskInstance]], preamble=None):
+    def display_schedule_chunk(cls, tasks: List[TaskInstance], preamble=None):
         if preamble is not None:
             print(preamble)
         for task in tasks:

@@ -1,16 +1,15 @@
 from abc import ABC
 from datetime import date
-from typing import Union, List
+from typing import List
 
-from RecurringTaskInstance import RecurringTaskInstance
-from TransientTask import TransientTask
+from TaskInstance import TaskInstance
 
 
 class ScheduleView(ABC):
     start: date
     end: date
 
-    def __init__(self, tasks: List[Union[TransientTask, RecurringTaskInstance]]):
+    def __init__(self, tasks: List[TaskInstance]):
         self.tasks = sorted(
             filter(lambda task: self.start <= task.start.date() <= self.end, tasks))
 

@@ -1,14 +1,13 @@
 from datetime import date
-from typing import List, Union
+from typing import List
 
 from CliView import CliView
-from RecurringTaskInstance import RecurringTaskInstance
 from ScheduleView import ScheduleView
-from TransientTask import TransientTask
+from TaskInstance import TaskInstance
 
 
 class DailyScheduleView(ScheduleView):
-    def __init__(self, tasks: List[Union[TransientTask, RecurringTaskInstance]], start: date):
+    def __init__(self, tasks: List[TaskInstance], start: date):
         self.start = start
         self.end = start
         super().__init__(tasks)

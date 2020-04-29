@@ -6,6 +6,7 @@ from FileHandler import FileHandler
 from RecurringTask import RecurringTask
 from RecurringTaskInstance import RecurringTaskInstance
 from Task import Task
+from TaskInstance import TaskInstance
 from TransientTask import TransientTask
 from exceptions import TaskNameNotUniqueError, TaskOverlapError, NoAntiTaskMatchError, PSSError, \
     PSSNoExistingTaskMatchError, TaskInsertionError, PSSInvalidOperationError
@@ -25,10 +26,10 @@ class TaskCollectionModel:
         return [cancellation for recurring_task in self.recurring_tasks
                           for cancellation in recurring_task.cancellations]
 
-    def get_recurring_task_instances(self):
+    def get_recurring_task_instances(self) -> List[RecurringTaskInstance]:
         return [instance for recurring_task in self.recurring_tasks for instance in RecurringTaskInstance.generate_instances(recurring_task)]
 
-    def get_task_instances(self):
+    def get_task_instances(self) -> List[TaskInstance]:
         return self.transient_tasks + self.get_recurring_task_instances()
 
     def check_name_uniqueness(self, task_name: str):
@@ -39,8 +40,7 @@ class TaskCollectionModel:
             raise TaskNameNotUniqueError(f'Task with name {task_name} already exists')
 
     def check_for_overlap_with_existing_task(self, new_task: Task):
-        existing_tasks = self.transient_tasks + [instance for recurring_task in self.recurring_tasks for instance in
-                                                 RecurringTaskInstance.generate_instances(recurring_task)]
+        existing_tasks = self.get_task_instances()
         new_task_instances = RecurringTaskInstance.generate_instances(
             new_task) if new_task.__class__ == RecurringTask else [new_task, ]
         for new_task_instance in new_task_instances:
@@ -103,7 +103,7 @@ class TaskCollectionModel:
             raise PSSNoExistingTaskMatchError('FLESH THIS MESSAGE OUT LATER IF NECESSARY. IT SHOULD NEVER RAISE')
 
     def remove_anti_task(self, anti_task: AntiTask, parent_task: RecurringTask=None):
-        removal_conflicts_with_task = anti_task.find_overlapping_task(self.transient_tasks + self.get_recurring_task_instances())
+        removal_conflicts_with_task = anti_task.find_overlapping_task(self.get_task_instances())
         if removal_conflicts_with_task is not None:
             raise PSSInvalidOperationError(f'AntiTask {anti_task.name} overlaps with {removal_conflicts_with_task}')
 
