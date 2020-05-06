@@ -147,6 +147,7 @@ class TaskCollectionModel:
             # Revert changes if revert_changes_on_error
             self.transient_tasks = transient_task_backup
             self.recurring_tasks = recurring_task_backup
+            raise PSSInvalidOperationError("Could not complete data import: Data invalid or contains conflict. No changes have been made.")
 
         recurring_tasks_by_name = {}
         recurring_tasks_by_name.update([(task.name, task) for task in self.recurring_tasks])
